@@ -48,3 +48,72 @@ Thiết kế lược đồ cơ sở dữ liệu (Database Schema) cho hệ thố
 - Đưa ra bản refactor hoàn thiện. Phải tách logic ra, fix SQL Injection, và xóa code trùng lặp. Giải thích 3 gạch đầu dòng về lý do thay đổi.
 
 **Constraint:** KHÔNG đụng đến Phần 4 (Review Code) và Phần 5 (Testing). Chỉ xuất ra cấu trúc thư mục Node.js và nội dung mã nguồn của các file cần thiết.
+
+# Phần 4
+
+Đóng vai là một Senior Java Developer và chuyên gia bảo mật (Security Expert). Hãy review đoạn mã nguồn LoginServlet.java được cung cấp. Thực hiện các yêu cầu sau:
+
+- Liệt kê ít nhất 4 vấn đề phát hiện được và phân loại chúng theo các nhóm: Bug, Security, Performance, Style.
+
+- Đánh giá mức độ ưu tiên (Critical, High, Medium, Low) cho từng vấn đề.
+
+- Đề xuất cách sửa mã nguồn chi tiết cho 2 vấn đề có mức độ ưu tiên cao nhất.
+
+# Phần 5
+
+**Ngữ cảnh & Dữ liệu đầu vào:**
+Hãy đọc các file mã nguồn hiện tại trong thư mục `@src`. Cụ thể, tập trung vào:
+
+1. `@src/services/borrowService.js` (Hàm xử lý logic mượn sách).
+2. `@src/controllers/borrowController.js` và `@src/routes/borrowRoutes.js` (Endpoint API mượn sách).
+3. `@src/config/db.js` (Cấu hình kết nối MySQL).
+4. `@src/app.js` (File khởi tạo Express app, dùng cho Supertest).
+
+**Vai trò & Code Taste:**
+Đóng vai là một Senior QA Automation Engineer chuyên viết test cho Node.js backend. Bạn cần viết test code sao cho thật "Clean":
+
+- Sử dụng Jest làm test runner và Supertest để test API.
+- Cú pháp ES6+, sử dụng `describe`, `it`, `beforeEach`, `afterAll` rõ ràng.
+- Các test case phải độc lập (independent), không phụ thuộc thứ tự chạy.
+- Phải có comment ngắn gọn mô tả mục đích của mỗi block test để nộp báo cáo.
+
+**Nhiệm vụ (Chỉ thực hiện Phần 5 của đồ án):**
+Hãy sinh ra 2 file test hoàn chỉnh. Không sửa đổi mã nguồn gốc (trừ khi phát hiện lỗi chí mạng ngăn cản việc test).
+**Nhiệm vụ 1 (Câu 5.1): Viết Unit Test cho `borrowService**`
+
+- Tạo file: `@tests/unit/borrowService.test.js`
+- Sử dụng `jest.mock('../../src/config/db')` để giả lập (mock) toàn bộ các kết nối và truy vấn DB (không gọi DB thật).
+- Sử dụng `mockReturnValue` hoặc `mockResolvedValue` để trả về dữ liệu giả cho các trường hợp:
+
+1. **Happy path:** User tồn tại, sách còn sẵn (available_qty > 0) -> Trả về record mượn thành công.
+2. **Edge case 1:** Sách đã hết (available_qty = 0) -> Ném lỗi.
+3. **Edge case 2:** User không tồn tại -> Ném lỗi. 4. **Edge case 3:** User đang mượn cuốn sách này rồi (Duplicate borrow) -> Ném lỗi.
+
+**Nhiệm vụ 2 (Câu 5.2): Viết Integration Test cho API `POST /api/borrow`**
+
+- Tạo file: `@tests/integration/borrowApi.test.js`
+- Import Express app từ `@src/app.js` và dùng thư viện `supertest`.
+- Thực hiện mock cơ sở dữ liệu hoặc sử dụng setup/teardown khéo léo để cô lập test. Nếu dùng mock cho middleware xác thực (`authenticate.js`), hãy đảm bảo token giả hoạt động.
+- Viết 3 test cases:
+
+1.  **Thành công (201):** Gửi kèm token hợp lệ, payload đúng -> Assert HTTP status 201 và response body có chứa thông tin mượn.
+2.  **Không có token (401):** Gửi request không có Header `Authorization` -> Assert HTTP status 401. 3. **Sách hết (400):** Gửi request hợp lệ nhưng mock DB trả về hết sách -> Assert HTTP status 400.
+
+    **Output yêu cầu:** Sinh ra mã nguồn đầy đủ của 2 file test trên. Đảm bảo có thể chạy lệnh `npx jest` và pass ngay lập tức.
+
+---
+
+### Lưu ý nhỏ trước khi chạy:
+
+Vì chúng ta sẽ dùng **Jest** và **Supertest**, bạn cần đảm bảo đã cài đặt 2 thư viện này vào môi trường dev của dự án. Mở terminal tại thư mục gốc và chạy lệnh sau (nếu chưa cài):
+
+```bash
+pnpm add -D jest supertest
+
+```
+
+Ngoài ra, bạn cần thêm script chạy test vào file `package.json` (AI IDE có thể sẽ tự làm việc này, nhưng nếu không, bạn bổ sung thủ công dòng này vào mục `"scripts"`):
+
+```json
+"test": "jest --detectOpenHandles"
+```

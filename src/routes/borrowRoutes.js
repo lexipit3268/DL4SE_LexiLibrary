@@ -17,7 +17,7 @@ const borrowRouter = Router();
  * POST /api/borrow
  * Mượn sách — yêu cầu JWT hợp lệ.
  */
-borrowRouter.post('/', authenticate, createBorrowRecord);
+borrowRouter.post('/borrow', authenticate, createBorrowRecord);
 
 /**
  * GET /api/users/:id/borrows
