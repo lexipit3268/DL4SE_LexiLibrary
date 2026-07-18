@@ -30,7 +30,7 @@ async function startServer() {
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT',  () => shutdown('SIGINT'));
   } catch (startupError) {
-    console.error('[Server] ❌ Không thể khởi động:', startupError.message);
+    console.error('[Server] ❌ Không thể khởi động:', startupError.message || startupError.code || startupError);
     process.exit(1);
   }
 }
