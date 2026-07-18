@@ -1,0 +1,49 @@
+@startuml name
+!theme plain
+hide circle
+skinparam linetype ortho
+
+entity "users" {
+  * id : INT <<PK>>
+  --
+  * email : VARCHAR(255) <<UNIQUE>>
+  * password_hash : VARCHAR(255)
+  role : ENUM('reader', 'librarian', 'admin')
+  created_at : TIMESTAMP
+}
+
+entity "categories" {
+  * id : INT <<PK>>
+  --
+  * name : VARCHAR(100)
+  description : TEXT
+}
+
+entity "books" {
+  * id : INT <<PK>>
+  --
+  * title : VARCHAR(255)
+  * author : VARCHAR(255)
+  isbn : VARCHAR(20) <<UNIQUE>>
+  * category_id : INT <<FK>>
+  * quantity : INT
+  * available_qty : INT
+}
+
+entity "borrow_records" {
+  * id : INT <<PK>>
+  --
+  * user_id : INT <<FK>>
+  * book_id : INT <<FK>>
+  borrow_date : TIMESTAMP
+  * due_date : TIMESTAMP
+  return_date : TIMESTAMP
+  status : ENUM('borrowed', 'returned', 'overdue')
+}
+
+' Định nghĩa các mối quan hệ (Quan hệ 1-N)
+categories ||..o{ books : "1 thể loại có nhiều sách"
+users ||..o{ borrow_records : "1 người dùng có nhiều phiếu mượn"
+books ||..o{ borrow_records : "1 cuốn sách nằm trong nhiều phiếu mượn"
+
+@enduml

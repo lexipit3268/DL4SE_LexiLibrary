@@ -1,0 +1,30 @@
+@startuml name
+!theme plain
+skinparam componentStyle rectangle
+
+node "Client Tier (Frontend)" {
+  [React UI] as UI
+  [Axios HTTP Client] as Axios
+  UI -> Axios : "User Actions"
+}
+
+node "Application Tier (Backend API)" {
+  interface "REST API" as API
+  component "Node.js / Express" {
+    [Auth Router] as Auth
+    [Book Router] as Book
+    [Borrow Router] as Borrow
+  }
+  Axios --> API : "HTTP/JSON requests"
+  API -down-> Auth
+  API -down-> Book
+  API -down-> Borrow
+}
+
+node "Data Tier (Database)" {
+  database "MySQL" as DB
+  Auth -down-> DB : "SQL queries"
+  Book -down-> DB : "SQL queries"
+  Borrow -down-> DB : "SQL queries"
+}
+@enduml
